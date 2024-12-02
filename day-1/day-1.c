@@ -28,13 +28,28 @@ int main(int argc, char *argv[]) {
 
   char line[LINE_LENGTH];
   while (fgets(line, sizeof(line), fptr)) {
-    char *sn1 = malloc(sizeof(char) * 5), *sn2 = malloc(sizeof(char) * 5);
-    memcpy(sn1, line, 5);
-    memcpy(sn2, &(line[8]), 5);
+    char sn1[6], sn2[6];
+
+    snprintf(sn1, 5, "%s", line);
+    snprintf(sn2, 5, "%s", &line[8]);
 
     count++;
-    ll = realloc(ll, sizeof(long) * count);
-    lr = realloc(lr, sizeof(long) * count);
+
+    long *temp = realloc(ll, sizeof(long) * count);
+    if (temp == NULL) {
+      free(ll);
+      printf("err: failed to reallocate memory\n");
+      return 1;
+    }
+    ll = temp;
+
+    temp = realloc(lr, sizeof(long) * count);
+    if (temp == NULL) {
+      free(lr);
+      printf("err: failed to reallocate memory\n");
+      return 1;
+    }
+    lr = temp;
 
     ll[count - 1] = strtol(sn1, NULL, 10);
     lr[count - 1] = strtol(sn2, NULL, 10);
@@ -64,6 +79,9 @@ int main(int argc, char *argv[]) {
 
     fscore += (ll[i] * appears);
   }
+
+  free(ll);
+  free(lr);
 
   printf("total distance: %d\n", sum);
   printf("frequency score: %d\n", fscore);
